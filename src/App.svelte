@@ -1,91 +1,101 @@
 <script>
   import { onMount } from "svelte";
-  import uuid from "uuid-v4";
   import moment from "moment";
-  import Icon from "fa-svelte";
-  import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
-
-  let currentInput;
-  let inputArea;
+  import { auth, googleProvider, db, setPersistence } from './firebase.setup.js';
+  import Login from './Login.svelte';
+  import { saveItemToDb, getItemsFromDb, deleteItemFromDb } from './db.js';
+  import { authenticateUser } from './auth.js';
+  import { extractTagsFromText } from './utils.js';
+  import InputSection from './InputSection.svelte';
+  import DisplaySection from './DisplaySection.svelte';
+  
   let items = [];
+  let user = null;
+  let chosenDate = moment().format('DDMMYYYY');
 
-  onMount(() => {
-    inputArea.focus();
-  });
-
-  const handleKeyPress = e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      items = [
-        ...items,
-        { text: currentInput, date: moment().format("LLL"), id: uuid() }
-      ];
-      currentInput = "";
-      inputArea.focus();
-    }
+  const getItems = () => {
+    getItemsFromDb(user.uid, chosenDate, (doc) => {
+       items = doc.docs.map(item => (
+         {
+           ...item.data(),
+           dbId: item.id,
+        }));
+    });
   };
 
-  const deleteItem = id => {
-    items = items.filter(item => item.id !== id);
-    inputArea.focus();
+  $: {
+    if (chosenDate.length === 8 && moment(chosenDate, 'DDMMYYYY')._isValid && user) {
+      getItems();
+    }
+  }
+
+  onMount(() => {
+    user = JSON.parse(window.localStorage.getItem('user'));
+    if (user) {
+      getItems();
+    }
+  });
+
+  const login = (stayLoggedIn) => {
+    authenticateUser(stayLoggedIn, (authenticatedUser) => {
+      user = authenticatedUser;
+    });
+  }
+
+  const saveInput = input => {
+    const { text, tags } = extractTagsFromText(input);
+    saveItemToDb(user, text, chosenDate, tags);
   };
 </script>
 
+<main>
+  <section>
+    <InputSection {saveInput} />
+  </section>
+  <section>
+    <div>
+      {#if !user}
+        <Login login={login} />
+        {:else}
+        <datepicker>
+          <input type="text" bind:value={chosenDate} />
+        </datepicker>
+        <user>Hi, <green>{user.displayName}!</green></user>
+      {/if}
+    </div>
+    <DisplaySection {items} {user} {deleteItemFromDb} {chosenDate} />
+  </section>
+</main>
+
+
 <style>
   main {
-    padding: 64px;
-    font-size: 28px;
+    display: flex;
   }
 
-  textarea {
-    background: transparent;
-    border: none;
-    width: 100%;
-    resize: none;
-    outline: none;
-    padding: 8px 16px;
-  }
-
-  section > div {
-    margin: 8px;
+  main > section {
+    height: 100vh;
     overflow: hidden;
-    padding: 8px 16px;
-    color: gray;
+    flex: 1;
   }
 
-  section > div > p:nth-child(2) {
-    font-size: 12px;
-    color: gray;
+  main > section:nth-child(1) {
+    min-width: 55%;
+  }
+
+  main > section > div {
+    background-color: white;
+    padding: 16px 32px;
     text-align: right;
   }
 
-  section > div > p:nth-child(2) > span {
-    margin-left: 10px;
-    color: red;
+  main > section > div > user > green {
+    color: green;
   }
 
-  section > div > p:nth-child(2) > span:hover {
-    cursor: pointer;
+  datepicker {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
   }
 </style>
-
-<main>
-  <section>
-    {#each items as item}
-      <div>
-        <p>{item.text}</p>
-        <p>
-          {item.date}
-          <span on:click={() => deleteItem(item.id)}>
-            <Icon icon={faTrash} />
-          </span>
-        </p>
-      </div>
-    {/each}
-  </section>
-  <section>
-    <textarea
-      bind:this={inputArea}
-      bind:value={currentInput}
-      on:keypress={handleKeyPress} />
-  </section>
-</main>
