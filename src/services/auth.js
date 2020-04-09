@@ -1,4 +1,4 @@
-import { auth, googleProvider, setPersistence } from "./firebase.setup.js";
+import { auth, googleProvider, setPersistence } from "../firebase.setup.js";
 
 export const authenticateUser = (stayLoggedIn, callback) => {
   const doLogin = () => {

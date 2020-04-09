@@ -1,39 +1,14 @@
 <script>
   import { onMount } from "svelte";
   import moment from "moment";
-  import { auth, googleProvider, db, setPersistence } from './firebase.setup.js';
-  import Login from './Login.svelte';
-  import { saveItemToDb, getItemsFromDb, deleteItemFromDb } from './db.js';
-  import { authenticateUser } from './auth.js';
-  import { extractTagsFromText } from './utils.js';
-  import InputSection from './InputSection.svelte';
-  import DisplaySection from './DisplaySection.svelte';
-  
-  let items = [];
+  import { Toolbar, MobileView, DesktopView } from './components';
+  import { authenticateUser } from './services/auth.js';
+
   let user = null;
   let chosenDate = moment().format('DDMMYYYY');
 
-  const getItems = () => {
-    getItemsFromDb(user.uid, chosenDate, (doc) => {
-       items = doc.docs.map(item => (
-         {
-           ...item.data(),
-           dbId: item.id,
-        }));
-    });
-  };
-
-  $: {
-    if (chosenDate.length === 8 && moment(chosenDate, 'DDMMYYYY')._isValid && user) {
-      getItems();
-    }
-  }
-
   onMount(() => {
     user = JSON.parse(window.localStorage.getItem('user'));
-    if (user) {
-      getItems();
-    }
   });
 
   const login = (stayLoggedIn) => {
@@ -41,61 +16,48 @@
       user = authenticatedUser;
     });
   }
-
-  const saveInput = input => {
-    const { text, tags } = extractTagsFromText(input);
-    saveItemToDb(user, text, chosenDate, tags);
-  };
 </script>
 
-<main>
-  <section>
-    <InputSection {saveInput} />
-  </section>
-  <section>
-    <div>
-      {#if !user}
-        <Login login={login} />
-        {:else}
-        <datepicker>
-          <input type="text" bind:value={chosenDate} />
-        </datepicker>
-        <user>Hi, <green>{user.displayName}!</green></user>
-      {/if}
-    </div>
-    <DisplaySection {items} {user} {deleteItemFromDb} {chosenDate} />
-  </section>
-</main>
-
+<div>
+  <Toolbar {user} {login} />
+  <div class="desktop-view-container">
+    <DesktopView {user} />
+  </div>
+  <div class="mobile-view-container">
+    <MobileView {user} />
+  </div>
+</div>
 
 <style>
-  main {
-    display: flex;
-  }
-
-  main > section {
+  div {
     height: 100vh;
-    overflow: hidden;
-    flex: 1;
+    box-sizing: border-box;
   }
 
-  main > section:nth-child(1) {
-    min-width: 55%;
+  div > div {
+    height: 94%;
   }
 
-  main > section > div {
-    background-color: white;
-    padding: 16px 32px;
-    text-align: right;
-  }
+  .desktop-view-container {
+      display: block;
+    }
 
-  main > section > div > user > green {
-    color: green;
-  }
+    .mobile-view-container {
+      display: none;
+    }
 
-  datepicker {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
+  @media only screen and (max-width: 1215px) {
+    main {
+      display: block;
+      padding: 0;
+    }
+
+    .desktop-view-container {
+      display: none;
+    }
+
+    .mobile-view-container {
+      display: block;
+    }
   }
 </style>

@@ -3,6 +3,10 @@
 
   let stayLoggedIn = false;
   let modalOpen = false;
+
+  $: {
+    console.log("Modal open" + modalOpen);
+  }
 </script>
 
 <section>
@@ -43,9 +47,11 @@
   }
 
   modal {
-    position: absolute;
     width: 100%;
     height: 100vh;
+    position: absolute;
+    left: 0;
+    top: 0;
     background-color: rgba(0, 0, 0, 0.6);
     z-index: 100000;
   }
