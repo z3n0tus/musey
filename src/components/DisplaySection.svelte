@@ -60,7 +60,6 @@
     font-size: 20px;
     height: 100%;
     box-sizing: border-box;
-    overflow: scroll;
   }
 
   main::-webkit-scrollbar {

@@ -17,6 +17,8 @@
     overflow: scroll;
     height: 100%;
     box-sizing: border-box;
+    width: 100%;
+    overflow-wrap: break-word;
   }
 
   .markdown-renderer::-webkit-scrollbar {
@@ -60,10 +62,6 @@
     box-sizing: border-box;
     width: auto;
     overflow: scroll;
-  }
-
-  :global(.markdown-renderer > pre::-webkit-scrollbar) {
-    display: none;
   }
 </style>
 
