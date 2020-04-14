@@ -1,19 +1,35 @@
 <script>
+  import Icon from "fa-svelte";
+  import moment from 'moment';
+  import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
   import Button from '../Button/index.svelte';
   import InputSection from '../InputSection.svelte';
   import MarkdownRenderer from '../MarkdownRenderer.svelte';
+  import { createTodo } from '../../services/todo';
   import { saveItemToDb } from '../../services/db.js';
   import { extractTagsFromText } from '../../utils.js';
 
   let preview = '';
+
+  const isTodo = () => {
+    return preview.startsWith('{#todo}');
+  }
   
-  const saveInput = () => {
-    const { text, tags } = extractTagsFromText(input);
-    saveItemToDb(user, text, moment().format('DDMMYYYY'), tags);
-    preview = '';
+  const saveInput = async () => {
+    if(isTodo()) {
+      const [title, date] = preview.replace('{#todo}', '').split('{}');
+      createTodo(user, { title, date, completed: false });
+      closeModal();
+    } else {
+      const { text, tags } = extractTagsFromText(preview);
+      saveItemToDb(user, preview, moment().format('DDMMYYYY'), tags);
+      preview = '';
+      closeModal();
+    }
   };
 
   export let user;
+  export let closeModal;
 </script>
 
 <main>
@@ -29,6 +45,9 @@
     </div>
     <div class="save-button">
       <Button click={saveInput}>Submit</Button>
+    </div>
+    <div class="close-button" on:click={closeModal}>
+      <Icon icon={faTimes} />
     </div>
   </div>
 </main>
@@ -80,9 +99,10 @@
     width: 132px;
   }
 
-  .close {
+  .close-button {
     position: absolute;
-    top: 8px;
+    top: 16px;
     right: 16px;
+    cursor: pointer;
   }
 </style>

@@ -3,6 +3,7 @@ import uuid from "uuid-v4";
 import { db } from "../firebase.setup.js";
 
 export const saveItemToDb = (user, text, date, tags = []) => {
+  console.log('saving!')
   if (text.trim().length !== 0) {
     const formattedDate = moment().format("LLL");
     const newItem = { text, date, tags, formattedDate, trackingId: uuid() };

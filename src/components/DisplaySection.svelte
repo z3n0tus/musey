@@ -57,7 +57,6 @@
 
 <style>
   main {
-    font-size: 20px;
     height: 100%;
     box-sizing: border-box;
   }
@@ -66,50 +65,68 @@
     display: none;
   }
 
-  section {
-    display: flex;
-  }
-
-  section > div {
-    flex: 1;
+  h2 {
+    margin: 0;
+    margin-bottom: 32px;
   }
 
   input {
     background: transparent;
-    width: 100%;
-    font-size: 16px;
-    height: 100%;
-    outline: none;
+    font-size: 10px;
     border: 1px solid #eeeeee;
+    box-sizing: border-box;
   }
 
   select {
     background: transparent;
     width: 100%;
-    font-size: 16px;
+    font-size: 10px;
     outline: none;
-    height: 100%;
-    border: 1px solid #eeeeee;
+    border: none;
   }
 
   .note-container:last-child() {
     margin-bottom: 200px;
   }
+
+  .header-bar {
+    display: flex;
+  }
+
+  .header-text {
+    flex: 1;
+  }
+
+  .tag-select {
+    width: 100px;
+    font-size: 14px;
+  }
+
+  .date-select {
+    width: 100px;
+  }
+
+  input {
+    width: 100%;
+  }
 </style>
 
 <main>
-    <section class="control-bar">
-      <div>
-        <input bind:value={chosenDate} placeholder="Enter date to filter results" type="text">
-      </div>
-      <div>
-        <select bind:value={selectedTag}>
-          {#each tags as tag}
-            <option>{tag}</option>
-          {/each}
-        </select>
-      </div>
-    </section>
+  <div class="header-bar">
+    <div class="header-text">
+      <h2>My Museys</h2>
+    </div>
+    <div class="tag-select">
+      <select bind:value={selectedTag}>
+        {#each tags as tag}
+          <option>{tag}</option>
+        {/each}
+      </select>
+    </div>
+    <div class="date-select">
+      <input bind:value={chosenDate} placeholder="Enter date to filter results" type="text">
+    </div>
+  </div>
    {#each items as item}
     <div class="note-container">
       <Note

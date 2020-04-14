@@ -5,44 +5,40 @@
   import DisplaySection from './DisplaySection.svelte';
   import Todo from './Todo/index.svelte';
 
-  let showMuseyModal = true;
+  let showMuseyModal = false;
 
   const toggleMuseyModal = () => showMuseyModal = !showMuseyModal;
 
   export let user;
 </script>
 
+{#if user}
 <main>
   <div class="btn-new-musey">
     <Button click={toggleMuseyModal}>
       New Musey
     </Button>
+    </div>
+
 
     {#if showMuseyModal}
-      <MuseyModal />
+      <MuseyModal closeModal={toggleMuseyModal} user={user} />
     {/if}
 
-  </div>
-</main>
-
-<!-- <main>
-  <section class="input-area">
-    <button on:click={togglePreview}>Toggle Markdown Preview</button>
-    <InputSection {user} {updatePreview} />
-  </section>
-  <section class="display-area">
-    {#if preview}
-      <MarkdownRenderer markdown={previewText} />
-    {:else}
-      <div class="to-do">
-        <Todo {user} />
-      </div>
+    <div class="main-content">
       <div class="museys">
         <DisplaySection {user} />
       </div>
-    {/if}
-  </section>
-</main> -->
+      <div class="to-dos">
+        <Todo {user} />
+      </div>
+      </div>
+</main>
+{:else}
+  <div class="please-login">
+    Hi, please click the login button at the top-right.
+  </div>
+{/if}
 
 <style>
   main {
@@ -59,27 +55,31 @@
     font-size: 1.2rem;
   }
 
-  .input-area {
-    width: 65%;
-    padding: 16px;
+  .please-login {
+    padding: 150px;
+    font-size: 32px;
   }
 
-  .display-area {
-    flex: 1;
+  .main-content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+  }
+
+  .main-content > div {
     padding: 32px;
-  }
-
-  .to-do {
-    height: 30%;
+    background-color: white;
+    border-radius: 15px;
+    margin: 30px auto;
   }
 
   .museys {
-    height: 60%;
+    width: 800px;
+    overflow: scroll;
   }
 
-  button {
-    background-color: white;
-    cursor: pointer;
-    border: none;
+  .to-dos {
+    width: 550px;
+    max-height: 780px;
   }
 </style>

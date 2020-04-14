@@ -1,31 +1,33 @@
 <script>
+  import moment from 'moment';
+  import Button from '../../../Button/index.svelte';
+  import Input from '../../../Input/index.svelte';
+
   let title = '';
-  let description = '';
+  let date = '';
   
   const save = () => {
-    saveTodo({ title, description, completed: false });
+    saveTodo({ title, date, completed: false });
   };
 
+  export let cancel;
   export let saveTodo;
 </script>
 
 <main>
   <div>
-    <input type="text" placeholder="Enter todo" bind:value={title} />
+    <Input placeholder="Enter todo" bind:input={title} />
   </div>
   <div>
-    <textarea placeholder="Enter description" cols="40" rows="3" bind:value={description} />
+    <Input placeholder="Enter due date (ddmmyyyy)" bind:input={date} />
   </div>
-  <button on:click={save}>Save</button>
+  <Button click={save}>Save</Button>
+  <Button click={cancel}>Cancel</Button>
 </main>
 
 <style>
   main {
     padding: 8px;
-  }
-
-  textarea {
-    width: 100%;
   }
 
   input {

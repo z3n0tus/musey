@@ -22,6 +22,10 @@ export const getTodos = async (user) => {
   return res.data().todos;
 };
 
+export const connectTodos = (user, cb) => {
+  db.collection(user.uid).doc('todos').onSnapshot(v => cb(v.data()));
+}
+
 export const updateTodo = async (user, id, newTodo) => {
   const todos = await getTodos(user);
 
