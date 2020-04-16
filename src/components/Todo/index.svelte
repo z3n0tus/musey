@@ -1,25 +1,47 @@
 <script>
   import { onMount } from 'svelte';
+  import { quintOut } from 'svelte/easing';
+  import { crossfade } from 'svelte/transition';
   import moment from 'moment';
   import Icon from "fa-svelte";
   import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
   import Button from '../Button/index.svelte';
-  import { createTodo, deleteTodo, connectTodos, updateTodo } from '../../services/todo.js';
+  import { createTodo, deleteTodo, updateTodo, getTodos } from '../../services/todo.js';
   import CreateTodo from './components/TodoEditor/index.svelte';
 
   let showTodoEditor = false;
   let todos = [];
 
+  const getAllTodos = async () => {
+    todos = await getTodos(user);
+
+    todos = calculateDueDays(todos);
+    todos = orderByDate(todos);
+  };
+
   $ : {
     if (user && user.uid) {
-      connectTodos(user, (value) => {
-        todos = value.todos;
-
-        todos = calculateDueDays(todos);
-        todos = orderByDate(todos);
-      });
+      getAllTodos();
     }
   }
+
+ 	const [send, receive] = crossfade({
+		duration: d => Math.sqrt(d * 200),
+
+		fallback(node, params) {
+			const style = getComputedStyle(node);
+			const transform = style.transform === 'none' ? '' : style.transform;
+
+			return {
+				duration: 600,
+				easing: quintOut,
+				css: t => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`
+			};
+		}
+	});
 
   const toggleComplete = async (todo) => {
     const id = todo.id;
@@ -71,16 +93,14 @@
 
   const saveTodo = async (todo) => {
     await createTodo(user, todo);
-    // await getAllTodos(user);
     showTodoEditor = false;
+    getAllTodos();
   };
 
-  const deleteATodo = async (id) => {
-
-    todos = todos.filter(todo => todo.id !== id);
-
-    await deleteTodo(user, id)
-    // await getAllTodos();
+  const deleteATodo = async (todo) => {
+    todos = todos.filter(t => t.id !== todo.id);
+    await deleteTodo(user, todo.id);
+    getAllTodos();
   }
 
   export let user;
@@ -94,12 +114,12 @@
       </div>
     {/if}
     {#each todos as todo}
-      <div class="todo">
+      <div class="todo" out:send >
         <p on:click={() => toggleComplete(todo)} class:completed={todo.completed}>{todo.title}</p>
         <div class="due-in">
           <p>{todo.dueIn}</p>
         </div>
-        <div class='delete-todo' on:click={() => deleteATodo(todo.id)}>
+        <div class='delete-todo' on:click={() => deleteATodo(todo)}>
           <Icon icon={faTrash} />
         </div>
       </div>
