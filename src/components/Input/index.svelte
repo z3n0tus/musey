@@ -1,13 +1,16 @@
 <script>
-  export let input, placeholder;
+  export let input, placeholder, label;
 </script>
 
-<input bind:value={input} placeholder={placeholder} />
+<label>
+  <p>{label}</p>
+  <input bind:value={input} placeholder={placeholder} />
+</label>
 
 <style>
   input {
-    padding: 16px;
-    font-size: 20px;
+    padding: 8px;
+    font-size: 16px;
     width: 100%;
   }
 </style>

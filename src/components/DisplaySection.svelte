@@ -52,6 +52,8 @@
     }
   }
 
+  export let highlightedMusey;
+  export let clearHighlightedMusey;
   export let user;
 </script>
 
@@ -109,6 +111,10 @@
   input {
     width: 100%;
   }
+
+  .highlighted {
+    border-left: 3px solid slateblue;
+  }
 </style>
 
 <main>
@@ -127,6 +133,11 @@
       <input bind:value={chosenDate} placeholder="Enter date to filter results" type="text">
     </div>
   </div>
+  {#if highlightedMusey}
+    <div class="note-container highlighted">
+      <Note item={highlightedMusey} clearHighlightedMusey={clearHighlightedMusey} />
+    </div>
+  {/if}
    {#each items as item}
     <div class="note-container">
       <Note

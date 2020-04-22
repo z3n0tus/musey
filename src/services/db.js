@@ -3,10 +3,10 @@ import uuid from "uuid-v4";
 import { db } from "../firebase.setup.js";
 
 export const saveItemToDb = (user, text, date, tags = []) => {
-  console.log('saving!')
+  let trackingId = uuid();
   if (text.trim().length !== 0) {
     const formattedDate = moment().format("LLL");
-    const newItem = { text, date, tags, formattedDate, trackingId: uuid() };
+    const newItem = { text, date, tags, formattedDate, trackingId };
     if (user) {
       db.collection(`${user.uid}/items/${date}`).add(newItem);
       tags.forEach(tag => {
@@ -15,6 +15,8 @@ export const saveItemToDb = (user, text, date, tags = []) => {
       });
     }
   }
+
+  return trackingId;
 };
 
 export const getTagsFromDb = (user, callback) =>

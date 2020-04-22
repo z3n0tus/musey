@@ -3,11 +3,20 @@
   import Button from './Button/index.svelte';
   import MuseyModal from './MuseyModal/index.svelte';
   import DisplaySection from './DisplaySection.svelte';
-  import TabPanel from './TabPanel/index.svelte';
+  import Reminders from './Reminders/index.svelte';
 
   let showMuseyModal = false;
+  let highlightedMusey = null;
 
   const toggleMuseyModal = () => showMuseyModal = !showMuseyModal;
+
+  const setHighlightedMusey = (musey) => {
+    highlightedMusey = musey;
+  };
+
+  const clearHighlightedMusey = () => {
+    highlightedMusey = null;
+  }
 
   export let user;
 </script>
@@ -27,10 +36,10 @@
 
     <div class="main-content">
       <div class="museys">
-        <DisplaySection {user} />
+        <DisplaySection {user} highlightedMusey={highlightedMusey} clearHighlightedMusey={clearHighlightedMusey} />
       </div>
       <div class="side-panel">
-        <TabPanel {user} />
+        <Reminders user={user} setHighlightedMusey={setHighlightedMusey} />
       </div>
     </div>
 </main>

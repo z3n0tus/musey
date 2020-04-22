@@ -5,6 +5,7 @@
   import moment from 'moment';
   import Icon from "fa-svelte";
   import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+  import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
   import Button from '../Button/index.svelte';
   import { createTodo, deleteTodo, updateTodo, getTodos } from '../../services/todo.js';
   import CreateTodo from './components/TodoEditor/index.svelte';
@@ -106,7 +107,12 @@
   export let user;
 </script>
 
-<h2>My To-dos</h2>
+<div class="title">
+  <p>My To-dos</p>
+  <div class="new-todo-button" on:click={() => showTodoEditor = true}>
+    <Icon icon={faPlus} />
+  </div>
+</div>
 <div class="todos-container">
     {#if showTodoEditor}
       <div class="create-todo">
@@ -125,21 +131,22 @@
       </div>
     {/each}
 </div>
-<div class='new-todo-button'>
-  <Button click={() => showTodoEditor = true}>New Todo</Button>
-</div>
 
 <style>
   .todos-container {
-    height: 75%;
     overflow: scroll;
     -ms-overflow-style: none;
     width: 100%;
+    height: 550px;
   }
 
-  h2 {
+  p {
     margin: 0;
-    margin-bottom: 32px;
+    padding-right: 16px;
+  }
+
+  .new-todo-button {
+    cursor: pointer;
   }
 
   .todos-container::-webkit-scrollbar {
@@ -177,9 +184,8 @@
     margin: 16px auto;
   }
 
-  .new-todo-button {
-    width: 350px;
-    margin: 16px auto;
+  .title {
+    display: flex;
   }
 
   .due-in {

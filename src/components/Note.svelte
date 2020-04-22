@@ -2,22 +2,31 @@
   import Icon from "fa-svelte";
   import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
   import MarkdownRenderer from './MarkdownRenderer.svelte';
+
   export let item;
   export let deleteItem;
+  export let clearHighlightedMusey;
 </script>
 
 <div class="note">
   <MarkdownRenderer markdown={item.text} />
   <div class="meta-info">
+    {#if item.tags}
+      <p>
+        {#each item.tags as tag}
+          <div>{tag}</div>
+        {/each}
+      </p>
+    {/if}
     <p>
-      {#each item.tags as tag}
-        <div>{tag}</div>
-      {/each}
-    <p>
-      {item.formattedDate || item.date}
-      <span on:click={() => deleteItem(item)}>
-        <Icon icon={faTrash} />
-      </span>
+      {item.formattedDate || item.date || ''}
+      {#if deleteItem}
+        <span on:click={() => deleteItem(item)}>
+          <Icon icon={faTrash} />
+        </span>
+        {:else}
+        <p class="clear" on:click={clearHighlightedMusey}>Clear Highlighted Musey</p>
+      {/if}
     </p>
   </div>
 </div>
@@ -38,6 +47,10 @@
   p > span {
     color: red;
     margin-left: 16px;
+    cursor: pointer;
+  }
+
+  .clear {
     cursor: pointer;
   }
 </style>

@@ -16,20 +16,22 @@
   }
   
   const saveInput = async () => {
-    if(isTodo()) {
-      const [title, date] = preview.replace('{#todo}', '').split('{}');
-      createTodo(user, { title, date, completed: false });
-      closeModal();
+    const { text, tags } = extractTagsFromText(preview);
+    const date = moment().format('DDMMYYYY');
+    if (passMuseyUp) {
+      passMuseyUp({ text })
     } else {
-      const { text, tags } = extractTagsFromText(preview);
-      saveItemToDb(user, preview, moment().format('DDMMYYYY'), tags);
-      preview = '';
-      closeModal();
+      saveItemToDb(user, preview, date, tags);
     }
+    preview = '';
+    closeModal();
   };
 
   export let user;
   export let closeModal;
+
+  // This is used by the reminder editor to associate a musey with a reminder.
+  export let passMuseyUp = null;
 </script>
 
 <main>
