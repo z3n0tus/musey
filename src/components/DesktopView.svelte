@@ -3,7 +3,7 @@
   import Button from './Button/index.svelte';
   import MuseyModal from './MuseyModal/index.svelte';
   import DisplaySection from './DisplaySection.svelte';
-  import Todo from './Todo/index.svelte';
+  import TabPanel from './TabPanel/index.svelte';
 
   let showMuseyModal = false;
 
@@ -29,10 +29,10 @@
       <div class="museys">
         <DisplaySection {user} />
       </div>
-      <div class="to-dos">
-        <Todo {user} />
+      <div class="side-panel">
+        <TabPanel {user} />
       </div>
-      </div>
+    </div>
 </main>
 {:else}
   <div class="please-login">
@@ -68,9 +68,9 @@
 
   .main-content > div {
     padding: 32px;
-    background-color: white;
     border-radius: 15px;
     margin: 30px auto;
+    background-color: white;
   }
 
   .museys {
@@ -78,8 +78,7 @@
     overflow: scroll;
   }
 
-  .to-dos {
-    width: 550px;
-    max-height: 780px;
+  .side-panel {
+    width: 700px;
   }
 </style>
