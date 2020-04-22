@@ -23,8 +23,10 @@ export const getTodos = async (user) => {
 };
 
 export const connectTodos = (user, cb) => {
-  db.collection(user.uid).doc('todos').onSnapshot(v => cb(v.data()));
-}
+  db.collection(user.uid)
+    .doc("todos")
+    .onSnapshot((v) => cb(v.data()));
+};
 
 export const updateTodo = async (user, id, newTodo) => {
   const todos = await getTodos(user);
