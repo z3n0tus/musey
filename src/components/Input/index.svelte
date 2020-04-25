@@ -1,10 +1,10 @@
 <script>
-  export let input, placeholder, label;
+  export let input, placeholder, label, onFocus, onBlur;
 </script>
 
 <label>
-  <p>{label}</p>
-  <input bind:value={input} placeholder={placeholder} />
+  {#if label}<p>{label}</p>{/if}
+  <input bind:value={input} placeholder={placeholder} on:blur={onBlur} on:focus={onFocus}  />
 </label>
 
 <style>

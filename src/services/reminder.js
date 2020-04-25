@@ -21,4 +21,13 @@ export const getAllReminders = async (user) => {
   const res = await docRef.get();
   const data = res.data();
   return data ? data.reminders : [];
-}
+};
+
+export const deleteReminder = async (user, id) => {
+  const reminders = await getAllReminders(user);
+
+  const filteredReminders = reminders.filter((reminder) => reminder.id !== id);
+
+  const docRef = db.collection(user.uid).doc("reminders");
+  await docRef.update({ reminders: filteredReminders });
+};

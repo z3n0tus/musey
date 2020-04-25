@@ -1,5 +1,5 @@
 <script>
-  import DisplaySection from './DisplaySection.svelte';
+  import Museys from './Museys/index.svelte';
   import InputSection from './InputSection.svelte';
 
   let tabs = ['Notes', 'Editor'];
@@ -17,7 +17,7 @@
     {/each}
   </div>
   {#if activeTab === 'Notes'}
-    <DisplaySection {user} />
+    <Museys {user} />
   {:else}
     <InputSection {user} />
   {/if}

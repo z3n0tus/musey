@@ -5,7 +5,7 @@
   import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
   import { RemindersList, ReminderEditor } from './components';
   import { checkShouldStartReminding } from './helpers.js';
-  import { getAllReminders, createReminder } from '../../services/reminder.js';
+  import { getAllReminders, createReminder, deleteReminder } from '../../services/reminder.js';
 
   let allReminders = [];
   let filteredReminders = [];
@@ -15,6 +15,18 @@
     filteredReminders = allReminders.map(reminder => checkShouldStartReminding(reminder)).filter(reminder => reminder.startReminding);
   }
 
+  const deleteAReminder = async ({ id }) => {
+    filteredReminders = filteredReminders.filter(r => r.id !== id);
+    deleteReminder(user, id);
+  };
+
+  const saveReminder = async (reminder) => {
+    showReminderEditor = false;
+    createReminder(user, reminder).then(() => {
+      getReminders();
+    });
+  }
+
   onMount(() => {
     allReminders = getReminders();
   });
@@ -22,7 +34,6 @@
   let showReminderEditor = false;
 
   export let user;
-  export let setHighlightedMusey;
 </script>
 
 <div class="title">
@@ -34,9 +45,9 @@
 
 <main>
   { #if showReminderEditor }
-    <ReminderEditor save={(reminder) => createReminder(user, reminder)} />
+    <ReminderEditor save={saveReminder} />
   {:else}
-    <RemindersList reminders={filteredReminders} setHighlightedMusey={setHighlightedMusey} />
+    <RemindersList deleteReminder={deleteAReminder} reminders={filteredReminders} />
   {/if}
 </main>
 <style>

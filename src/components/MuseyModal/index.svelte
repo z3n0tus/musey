@@ -3,35 +3,28 @@
   import moment from 'moment';
   import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
   import Button from '../Button/index.svelte';
+  import Input from '../Input/index.svelte';
   import InputSection from '../InputSection.svelte';
   import MarkdownRenderer from '../MarkdownRenderer.svelte';
   import { createTodo } from '../../services/todo';
-  import { saveItemToDb } from '../../services/db.js';
-  import { extractTagsFromText } from '../../utils.js';
 
   let preview = '';
+  let tags = '';
 
-  const isTodo = () => {
-    return preview.startsWith('{#todo}');
-  }
-  
-  const saveInput = async () => {
-    const { text, tags } = extractTagsFromText(preview);
+  const save = async () => {
     const date = moment().format('DDMMYYYY');
-    if (passMuseyUp) {
-      passMuseyUp({ text })
-    } else {
-      saveItemToDb(user, preview, date, tags);
-    }
+    saveMusey({
+      content: preview,
+      tags,
+      date,
+    });
     preview = '';
-    closeModal();
+    closeModal(promise);
   };
 
   export let user;
   export let closeModal;
-
-  // This is used by the reminder editor to associate a musey with a reminder.
-  export let passMuseyUp = null;
+  export let saveMusey;
 </script>
 
 <main>
@@ -42,11 +35,16 @@
         <InputSection {user} updatePreview={val => preview = val} />
       </section>
       <section class="preview">
-        <MarkdownRenderer markdown={preview} />
+        <div class="markdown">
+          <MarkdownRenderer markdown={preview} />
+        </div>
+        <div class="add-tags">
+          <Input label="Add tags (comma-separated-list)" bind:input={tags} />
+        </div>
       </section>
     </div>
     <div class="save-button">
-      <Button click={saveInput}>Submit</Button>
+      <Button click={save}>Submit</Button>
     </div>
     <div class="close-button" on:click={closeModal}>
       <Icon icon={faTimes} />
@@ -86,9 +84,9 @@
   }
 
   .preview {
-    background-color: whitesmoke;
     height: 100%;
-    padding: 0 32px;
+    display: flex;
+    flex-direction: column;
   }
 
   .preview::-webkit-scrollbar {
@@ -106,5 +104,15 @@
     top: 16px;
     right: 16px;
     cursor: pointer;
+  }
+
+  .markdown {
+    flex: 1;
+    background-color: whitesmoke;
+    padding: 0 32px;
+  }
+
+  .add-tags {
+    padding: 8px;
   }
 </style>
