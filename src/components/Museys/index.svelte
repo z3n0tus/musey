@@ -36,6 +36,7 @@
   const getAllMuseysByDate = async () => {
     if (user) {
        museys = await getMuseysByDate(user, selectedDate);
+       console.log(museys);
     }
   }
 

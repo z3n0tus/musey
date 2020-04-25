@@ -8,11 +8,19 @@ const removeMuseyFromTags = async (user, tags, id) => {
   const tagObj = doc.data();
   const updatedTagsObject = { ...tagObj };
 
+  console.log("id", id);
+
   tags.forEach((tag) => {
+    console.log("[updatetagsobject]", updatedTagsObject[tag]);
     const updatedTags = updatedTagsObject[tag].filter(
       (musey) => musey.id !== id
     );
+
+    console.log("tags after filter", updatedTags);
+
     updatedTagsObject[tag] = updatedTags;
+    console.log("Hello!!! " + updatedTagsObject[tag].length);
+    console.log(updatedTagsObject[tag]);
     if (updatedTagsObject[tag].length === 0) {
       delete updatedTagsObject[tag];
     }
@@ -21,10 +29,9 @@ const removeMuseyFromTags = async (user, tags, id) => {
   docRef.set({ ...updatedTagsObject });
 };
 
-const saveTags = async (user, musey) => {
+const saveTags = async (user, musey, tags) => {
   const docRef = db.collection(user.uid).doc("tags");
   const doc = await docRef.get();
-  const tags = musey.tags;
 
   // A tag will have a number associated with it to define how many times it has been used.
   // This is so it's easy to know which tags can be safely deleted when a musey is deleted.
@@ -39,7 +46,7 @@ const saveTags = async (user, musey) => {
     const updatedTagsObject = { ...allTagsObj };
     tags.forEach((tag) => {
       if (updatedTagsObject[tag]) {
-        updatedTagsObject[tag] = [...updatedTagsObject[tag], ...musey];
+        updatedTagsObject[tag] = [...updatedTagsObject[tag], musey];
       } else {
         updatedTagsObject[tag] = [musey];
       }
@@ -53,25 +60,31 @@ export const createMusey = async (user, musey) => {
   const id = uuid();
   const docRef = db.collection(user.uid).doc("museys");
   const doc = await docRef.get();
+  const tags = musey.tags.trim().split(",");
 
   if (!doc.exists) {
-    await docRef.set({ [musey.date]: [{ ...musey, id }] });
+    await docRef.set({ [musey.date]: [{ ...musey, id, tags }] });
   } else {
     const museysForDate = doc.data()[musey.date];
-    const updatedMuseys = [...museysForDate, { ...musey, id }];
+    const updatedMuseys = [...museysForDate, { ...musey, id, tags }];
     await docRef.update({ [musey.date]: updatedMuseys });
   }
 
-  if (musey.tags.length > 0) {
-    await saveTags(user, { ...musey, id });
+  if (musey.tags.trim().length > 0) {
+    await saveTags(user, { ...musey, id }, tags);
   }
 };
 
 export const getMuseysByDate = async (user, date) => {
   const docRef = db.collection(user.uid).doc("museys");
   const doc = await docRef.get();
-  const museysForDate = doc.data()[date];
-  return museysForDate || [];
+
+  if (doc.exists) {
+    const museysForDate = doc.data()[date];
+    return museysForDate || [];
+  } else {
+    return [];
+  }
 };
 
 export const getMuseysByTag = async (user, tag) => {
@@ -85,11 +98,15 @@ export const getAllTags = async (user) => {
   const docRef = db.collection(user.uid).doc("tags");
   const doc = await docRef.get();
 
-  if (Object.keys(doc.data()).length > 0) {
-    return Object.keys(doc.data());
-  } else {
-    return [];
+  if (doc.exists) {
+    if (Object.keys(doc.data()).length > 0) {
+      return Object.keys(doc.data());
+    } else {
+      return [];
+    }
   }
+
+  return [];
 };
 
 export const deleteMusey = async (user, { id, date, tags }) => {
@@ -101,6 +118,6 @@ export const deleteMusey = async (user, { id, date, tags }) => {
   await docRef.update({ [date]: filteredMuseys });
 
   if (tags.length > 0) {
-    await removeMuseyFromTags(user, tags.trim().split(","), id);
+    await removeMuseyFromTags(user, tags, id);
   }
 };

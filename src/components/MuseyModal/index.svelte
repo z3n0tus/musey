@@ -19,7 +19,7 @@
       date,
     });
     preview = '';
-    closeModal(promise);
+    closeModal();
   };
 
   export let user;
